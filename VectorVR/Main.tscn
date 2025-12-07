@@ -1,0 +1,34 @@
+[gd_scene load_steps=7 format=3 uid="uid://4ujuqo0mv8m7"]
+
+[ext_resource type="Script" uid="uid://c1qxsrn4pcu30" path="res://Main.gd" id="1_geurq"]
+[ext_resource type="PackedScene" uid="uid://bj1aas6kty3qx" path="res://addons/godot-xr-tools/hands/scenes/lowpoly/left_physics_tac_glove_low.tscn" id="2_r0du0"]
+[ext_resource type="PackedScene" uid="uid://c2uvwvdlsfuep" path="res://addons/godot-xr-tools/hands/scenes/lowpoly/right_physics_tac_glove_low.tscn" id="3_cm0pq"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_x5ksh"]
+
+[sub_resource type="Sky" id="Sky_w0v8x"]
+sky_material = SubResource("ProceduralSkyMaterial_x5ksh")
+
+[sub_resource type="Environment" id="Environment_r6y2s"]
+background_mode = 2
+sky = SubResource("Sky_w0v8x")
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1_geurq")
+
+[node name="XROrigin3D" type="XROrigin3D" parent="."]
+
+[node name="XRCamera3D" type="XRCamera3D" parent="XROrigin3D"]
+
+[node name="XRControllerLeft" type="XRController3D" parent="XROrigin3D"]
+tracker = &"left_hand"
+
+[node name="LeftPhysicsHand" parent="XROrigin3D/XRControllerLeft" instance=ExtResource("2_r0du0")]
+
+[node name="XRControllerRight" type="XRController3D" parent="XROrigin3D"]
+tracker = &"right_hand"
+
+[node name="RightPhysicsHand" parent="XROrigin3D/XRControllerRight" instance=ExtResource("3_cm0pq")]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_r6y2s")
