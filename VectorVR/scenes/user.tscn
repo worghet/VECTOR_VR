@@ -1,9 +1,9 @@
 [gd_scene load_steps=6 format=3 uid="uid://bkfaxgc2mafj"]
 
-[ext_resource type="PackedScene" uid="uid://bj1aas6kty3qx" path="res://addons/godot-xr-tools/hands/scenes/lowpoly/left_physics_tac_glove_low.tscn" id="1_7np2n"]
 [ext_resource type="Script" uid="uid://bjvc4dl4bdltp" path="res://scripts/xr_control_logic.gd" id="1_e81rn"]
 [ext_resource type="PackedScene" uid="uid://b4ysuy43poobf" path="res://addons/godot-xr-tools/functions/function_pickup.tscn" id="2_e81rn"]
-[ext_resource type="PackedScene" uid="uid://c2uvwvdlsfuep" path="res://addons/godot-xr-tools/hands/scenes/lowpoly/right_physics_tac_glove_low.tscn" id="2_mwt1v"]
+[ext_resource type="PackedScene" uid="uid://bx1xdisoqo1f6" path="res://addons/godot-xr-tools/hands/scenes/lowpoly/left_tac_glove_low.tscn" id="2_s8n3g"]
+[ext_resource type="PackedScene" uid="uid://chumpejwiub7f" path="res://addons/godot-xr-tools/hands/scenes/lowpoly/right_tac_glove_low.tscn" id="4_dekx4"]
 [ext_resource type="PackedScene" uid="uid://diyu06cw06syv" path="res://addons/godot-xr-tools/player/player_body.tscn" id="7_205wt"]
 
 [node name="user" type="Node3D"]
@@ -16,14 +16,14 @@ script = ExtResource("1_e81rn")
 [node name="LeftController" type="XRController3D" parent="XROrigin3D"]
 tracker = &"left_hand"
 
-[node name="LeftHand" parent="XROrigin3D/LeftController" instance=ExtResource("1_7np2n")]
+[node name="LeftHand" parent="XROrigin3D/LeftController" instance=ExtResource("2_s8n3g")]
 
 [node name="PickupFunction" parent="XROrigin3D/LeftController/LeftHand" instance=ExtResource("2_e81rn")]
 
 [node name="RightController" type="XRController3D" parent="XROrigin3D"]
 tracker = &"right_hand"
 
-[node name="RightHand" parent="XROrigin3D/RightController" instance=ExtResource("2_mwt1v")]
+[node name="RightHand" parent="XROrigin3D/RightController" instance=ExtResource("4_dekx4")]
 
 [node name="PickupFunction" parent="XROrigin3D/RightController/RightHand" instance=ExtResource("2_e81rn")]
 
