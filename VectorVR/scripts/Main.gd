@@ -51,7 +51,7 @@ func initialize_references():
 
 func create_debug_hud():
 	debug_label = Label3D.new()
-	debug_label.font_size = 14
+	debug_label.font_size = 28
 	debug_label.outline_size = 4
 	debug_label.modulate = Color(0, 1, 0, 1)  # Green
 	debug_label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
@@ -71,6 +71,10 @@ func _process(_delta: float) -> void:
 		debug_label.text += "Paused: %s | Freeze: %s\n" % [is_time_paused, ball.freeze]
 		debug_label.text += "Stored: (%.2f, %.2f, %.2f)\n" % [stored_position.x, stored_position.y, stored_position.z]
 		debug_label.text += "Pause #%d | Trans: %s" % [pause_count, is_transitioning]
+		
+		# If paused and ball is picked up, update stored position
+		if is_time_paused and ball.is_picked_up():
+			stored_position = ball.global_position
 
 func _on_time_control_pressed(is_paused: bool):
 	# Prevent overlapping pause/unpause operations
@@ -104,11 +108,8 @@ func _on_time_control_pressed(is_paused: bool):
 			if projectile_node:
 				projectile_node.frozen_velocity = current_vel
 			
-			# DISABLE COLLISIONS
-			ball.collision_layer = 0
-			ball.collision_mask = 0
-			
-			# Freeze the ball
+			# DON'T disable collisions - let it stay grabbable
+			# Just freeze it in place
 			ball.freeze = true
 			ball.gravity_scale = 0.0
 			ball.linear_velocity = Vector3.ZERO
@@ -124,10 +125,6 @@ func _on_time_control_pressed(is_paused: bool):
 			
 			# Restore position IMMEDIATELY
 			ball.global_position = stored_position
-			
-			# Restore collisions
-			ball.collision_layer = stored_collision_layer
-			ball.collision_mask = stored_collision_mask
 			
 			# Unfreeze
 			ball.freeze = false
