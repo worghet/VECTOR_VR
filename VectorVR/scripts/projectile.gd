@@ -7,6 +7,7 @@ var vector_velocity_z : Node3D
 var vector_velocity_resultant : Node3D
 
 var vector_gravity: Node3D
+var vector_normal: Node3D  # NEW: Normal force vector
 
 var ball : XRToolsPickable
 
@@ -50,8 +51,10 @@ func _process(delta: float) -> void:
 func display_frozen_vectors() -> void:
 	velocity_vectors.visible = true
 	vector_gravity.visible = true
+	vector_normal.visible = true  # NEW
 	velocity_vectors.global_position = ball.global_position
 	vector_gravity.global_position = ball.global_position
+	vector_normal.global_position = ball.global_position  # NEW
 
 func initialize_nodes() -> void:
 	vector_velocity_x = get_node("velocities/velocity_X")
@@ -60,6 +63,7 @@ func initialize_nodes() -> void:
 	vector_velocity_resultant = get_node("velocities/velocity_RESULTANT")
 	velocity_vectors = get_node("velocities")
 	vector_gravity = get_node("forces/force_GRAVITY")
+	vector_normal = get_node("forces/force_NORMAL")  # NEW
 	ball = get_node("Ball")
 
 func set_velocity_colours() -> void:
@@ -95,24 +99,34 @@ func set_velocity_colours() -> void:
 	var coneRes = vector_velocity_resultant.get_node("Cone") as MeshInstance3D
 	coneRes.set_surface_override_material(0, orange)
 	
-	# FORCES (Purple gravity)
+	# FORCES (Purple gravity, Cyan normal)
 	var purple : StandardMaterial3D = StandardMaterial3D.new()
 	purple.albedo_color = Color.PURPLE
 	var rodGrav = vector_gravity.get_node("Rod") as MeshInstance3D
 	rodGrav.set_surface_override_material(0, purple)
 	var coneGrav = vector_gravity.get_node("Cone") as MeshInstance3D
 	coneGrav.set_surface_override_material(0, purple)
+	
+	# NEW: Normal force (Cyan)
+	var cyan : StandardMaterial3D = StandardMaterial3D.new()
+	cyan.albedo_color = Color.CYAN
+	var rodNorm = vector_normal.get_node("Rod") as MeshInstance3D
+	rodNorm.set_surface_override_material(0, cyan)
+	var coneNorm = vector_normal.get_node("Cone") as MeshInstance3D
+	coneNorm.set_surface_override_material(0, cyan)
 
 func process_vectors(delta: float) -> void:
 	velocity_vectors.visible = true
 	vector_gravity.visible = true
+	vector_normal.visible = true  # NEW
 	
 	velocity_vectors.global_position = ball.global_position
 	vector_gravity.global_position = ball.global_position
+	vector_normal.global_position = ball.global_position  # NEW
 	
 	var ball_velocity : Vector3 = ball.linear_velocity 
 	var lerp_speed : float = 10.0
-	var rotation_lerp_speed : float = 7.5  # SLOWER smoothing for rotation to reduce jitter
+	var rotation_lerp_speed : float = 7.5
 
 	# ===== COMPONENT VECTORS (X, Y, Z) =====
 	var target_x : float = ball_velocity.x * vector_scale
@@ -130,14 +144,11 @@ func process_vectors(delta: float) -> void:
 		var magnitude = ball_velocity.length()
 		var target_scale_y = magnitude * vector_scale
 		
-		# Smoothly lerp the scale
 		var current_scale = vector_velocity_resultant.scale.y
 		var new_scale = lerp(current_scale, target_scale_y, lerp_speed * delta)
 		
-		# Get normalized direction
 		var velocity_normalized = ball_velocity.normalized()
 		
-		# Build target basis
 		var target_basis = Basis()
 		target_basis.y = velocity_normalized
 		
@@ -148,25 +159,70 @@ func process_vectors(delta: float) -> void:
 			target_basis.z = velocity_normalized.cross(Vector3.RIGHT).normalized()
 			target_basis.x = velocity_normalized.cross(target_basis.z).normalized()
 		
-		# CRITICAL: Orthonormalize the basis before slerp!
 		target_basis = target_basis.orthonormalized()
 		
-		# Smoothly interpolate rotation using slerp (spherical lerp)
 		var current_basis = vector_velocity_resultant.basis.orthonormalized()
 		var interpolated_basis = current_basis.slerp(target_basis, rotation_lerp_speed * delta)
 		
-		# Apply smoothed rotation
 		vector_velocity_resultant.basis = interpolated_basis
-		
-		# Apply smoothed scale
 		vector_velocity_resultant.scale = Vector3(1.0, new_scale, 1.0)
 		
 	else:
-		# No velocity - shrink to invisible
 		vector_velocity_resultant.scale.y = lerp(vector_velocity_resultant.scale.y, 0.0, lerp_speed * delta)
 		vector_velocity_resultant.scale.x = 1.0
 		vector_velocity_resultant.scale.z = 1.0
 	
 	# ===== FORCES =====
+	# Gravity (downward)
 	var target_grav : float = ball.mass * ball.gravity_scale * vector_scale
 	vector_gravity.scale.y = lerp(vector_gravity.scale.y, target_grav, lerp_speed * delta)
+	
+	# NEW: Normal force calculation
+	calculate_normal_force(delta, lerp_speed)
+
+# NEW: Calculate normal force based on surface contact
+func calculate_normal_force(delta: float, lerp_speed: float) -> void:
+	# Check if ball is on a surface using raycast
+	var space_state = get_world_3d().direct_space_state
+	var query = PhysicsRayQueryParameters3D.create(
+		ball.global_position,
+		ball.global_position + Vector3.DOWN * 0.15  # Slightly longer than ball radius
+	)
+	query.exclude = [ball]
+	
+	var result = space_state.intersect_ray(query)
+	
+	if result:
+		# Ball is on a surface - calculate normal force
+		var surface_normal = result.normal
+		
+		# Normal force magnitude equals weight when on flat surface
+		# (For simplicity, assuming no acceleration perpendicular to surface)
+		var gravity_magnitude = ball.mass * ball.gravity_scale * 9.8
+		var normal_magnitude = gravity_magnitude * surface_normal.dot(Vector3.UP)
+		
+		# Only show if there's significant contact
+		if normal_magnitude > 0.1:
+			var target_scale = normal_magnitude * vector_scale * 0.1  # Scale down for visibility
+			vector_normal.scale.y = lerp(vector_normal.scale.y, target_scale, lerp_speed * delta)
+			
+			# Orient normal force in direction of surface normal
+			var target_basis = Basis()
+			target_basis.y = surface_normal
+			
+			if abs(surface_normal.y) < 0.99:
+				target_basis.x = surface_normal.cross(Vector3.UP).normalized()
+				target_basis.z = target_basis.x.cross(surface_normal).normalized()
+			else:
+				target_basis.z = surface_normal.cross(Vector3.RIGHT).normalized()
+				target_basis.x = surface_normal.cross(target_basis.z).normalized()
+			
+			target_basis = target_basis.orthonormalized()
+			var current_basis = vector_normal.basis.orthonormalized()
+			vector_normal.basis = current_basis.slerp(target_basis, lerp_speed * delta)
+		else:
+			# Shrink to invisible
+			vector_normal.scale.y = lerp(vector_normal.scale.y, 0.0, lerp_speed * delta)
+	else:
+		# Ball is in air - no normal force
+		vector_normal.scale.y = lerp(vector_normal.scale.y, 0.0, lerp_speed * delta)
