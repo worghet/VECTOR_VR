@@ -20,11 +20,17 @@ var time_toggle_flag : bool = false
 var time_paused : bool = false
 
 # movement settings
-var move_speed : float = 2.0
-var turn_speed : float = 2.0  # radians per second
+const DEFAULT_MOVE_SPEED = 2.0
+const DEFAULT_TURN_SPEED = 2.0 # radians per sec
+var move_speed : float = DEFAULT_MOVE_SPEED
+var turn_speed : float = DEFAULT_TURN_SPEED
 var snap_turn : bool = false  # snap turning (true) vs smooth (false)
 var snap_angle : float = PI / 4  # 45 degrees
 var turn_cooldown : float = 0.0
+
+var time_slow_flag : bool = false
+var time_slow : bool = false
+@export var slow_time_scale : float = 0.2
 
 func _ready() -> void:
 	initialize_nodes()
@@ -34,6 +40,7 @@ func _process(delta: float) -> void:
 	handle_turning(delta)
 	handle_reset()
 	handle_time_toggle()
+	handle_time_slow()
 
 
 # ---- useful stuff -------
@@ -109,6 +116,7 @@ func handle_reset() -> void:
 			reset_flag = true
 	else:
 		reset_flag = false
+		
 
 func handle_time_toggle() -> void:
 	# Using B/Y button for time control
@@ -119,3 +127,30 @@ func handle_time_toggle() -> void:
 			time_toggle_flag = true
 	else:
 		time_toggle_flag = false
+
+
+
+func handle_time_slow() -> void:
+	#Engine.time_scale = 0.5
+	
+	# Using B/Y button for time control
+	if right_controller.is_button_pressed("trigger_click") or Input.is_action_pressed("time_slow_key"):
+		
+		print("thing pressed")
+		if not time_slow_flag:
+			time_slow = !time_slow
+			toggle_slow_time()
+			time_slow_flag= true
+	else:
+		time_slow_flag = false
+
+
+func toggle_slow_time():
+	if time_slow:
+		Engine.time_scale = slow_time_scale
+		move_speed = DEFAULT_MOVE_SPEED / slow_time_scale
+		turn_speed = DEFAULT_TURN_SPEED / slow_time_scale
+	else:
+		Engine.time_scale = 1
+		move_speed = DEFAULT_MOVE_SPEED
+		turn_speed = DEFAULT_TURN_SPEED
