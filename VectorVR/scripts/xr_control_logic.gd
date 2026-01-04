@@ -3,7 +3,7 @@ extends XROrigin3D
 # signal
 
 signal time_toggled_signal(is_paused: bool)
-
+signal reset_ball(right_hand_position: Vector3)
 
 
 # useful nodes
@@ -94,21 +94,16 @@ func handle_turning(delta: float) -> void:
 
 # ----- reset stuff ------ (will need to add ball too)
 
-var start_position : Vector3 = Vector3(0, 1, 0)
-var start_rotation : Vector3 = Vector3.ZERO
-
 func reset_pressed() -> void:
 	reset_flag = true
 
 func reset_experience() -> void:
+	emit_signal("reset_ball", right_controller.global_position)
 
-	# reset position and rotation
-	self.position = start_position
-	self.rotation_degrees = start_rotation
 
 # trigger flag and whatnot
 func handle_reset() -> void:
-	if left_controller.is_button_pressed("ax_button"):
+	if right_controller.is_button_pressed("ax_button") or Input.is_action_pressed("ball_reset_key"):
 		if not reset_flag:
 			reset_experience()
 			reset_flag = true

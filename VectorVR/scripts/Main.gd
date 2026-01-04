@@ -39,6 +39,16 @@ func initialize_references():
 	
 	var xr_origin = user_node.get_node("XROrigin3D")
 	xr_origin.connect("time_toggled_signal", Callable(self, "_on_time_control_pressed"))
+	xr_origin.connect("reset_ball", Callable(self, "on_reset_called"))
+	# self.connect("time_toggled_signal", Callable(self, "on_reset_called"))
+
+func on_reset_called(right_hand_pos : Vector3):
+	var new_ball_pos = right_hand_pos
+	new_ball_pos.y += 0.1
+	ball.linear_velocity = Vector3.ZERO
+	ball.angular_velocity = Vector3.ZERO
+	ball.global_position = new_ball_pos
+	
 
 func _process(_delta: float) -> void:
 	# If paused and ball is picked up, update stored position

@@ -20,6 +20,8 @@ func _ready() -> void:
 	initialize_nodes()
 	set_velocity_colours()
 	create_pause_hud()
+	
+
 
 func create_pause_hud() -> void:
 	pause_label = Label3D.new()
