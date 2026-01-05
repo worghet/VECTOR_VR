@@ -1,0 +1,62 @@
+[gd_scene load_steps=7 format=3 uid="uid://bnk427tb46pb4"]
+
+[ext_resource type="PackedScene" uid="uid://b7ye7wyybjxxw" path="res://assets/tablet.glb" id="1_2qyfy"]
+[ext_resource type="Script" uid="uid://cvayg2k03lwyl" path="res://scenes/tablet.gd" id="1_suit2"]
+[ext_resource type="PackedScene" uid="uid://c8l60rnugru40" path="res://addons/godot-xr-tools/objects/pickable.tscn" id="2_jwrmr"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2qyfy"]
+albedo_color = Color(0, 0, 0, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_2qyfy"]
+material = SubResource("StandardMaterial3D_2qyfy")
+size = Vector3(0.01, 0.227, 0.329)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_jwrmr"]
+size = Vector3(0.1, 0.5, 0.5)
+
+[node name="Tablet" type="Node3D"]
+script = ExtResource("1_suit2")
+
+[node name="screen" type="MeshInstance3D" parent="."]
+transform = Transform3D(1.4, 0, 0, 0, 1.189, 0, 0, 0, 1.05, 0.006, 0, -0.033904105)
+mesh = SubResource("BoxMesh_2qyfy")
+skeleton = NodePath("../mesh")
+
+[node name="Label3D" type="Label3D" parent="screen"]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.3711406e-08, 0.005623406, 0.09113145, 0.14070489)
+pixel_size = 0.0001
+modulate = Color(1, 0, 0, 1)
+outline_modulate = Color(0, 0, 0, 0)
+text = "Vx = 21m/s"
+font_size = 100
+outline_size = 10
+horizontal_alignment = 0
+
+[node name="Label3D2" type="Label3D" parent="screen"]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.3711406e-08, 0.005623406, 0.07177369, 0.14070489)
+pixel_size = 0.0001
+modulate = Color(0, 1, 0, 1)
+outline_modulate = Color(0, 0, 0, 0)
+text = "Vy = 2m/s"
+font_size = 100
+outline_size = 10
+horizontal_alignment = 0
+
+[node name="Label3D3" type="Label3D" parent="screen"]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.3711406e-08, 0.005623406, 0.054164525, 0.14070489)
+pixel_size = 0.0001
+modulate = Color(0, 0, 0.88235295, 1)
+outline_modulate = Color(0, 0, 0, 0)
+text = "Vz = -23m/s"
+font_size = 100
+outline_size = 10
+horizontal_alignment = 0
+
+[node name="mesh" parent="." instance=ExtResource("1_2qyfy")]
+transform = Transform3D(0.7, 0, 0, 0, 0.7, 0, 0, 0, 0.7, 0, 0, 0)
+
+[node name="PickableObject" parent="." instance=ExtResource("2_jwrmr")]
+picked_up_layer = 1048576
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="PickableObject"]
+shape = SubResource("BoxShape3D_jwrmr")

@@ -19,6 +19,9 @@ var reset_flag : bool = false
 var time_toggle_flag : bool = false
 var time_paused : bool = false
 
+var slow_label : Node3D 
+var pause_label : Node3D
+
 # movement settings
 const DEFAULT_MOVE_SPEED = 2.0
 const DEFAULT_TURN_SPEED = 2.0 # radians per sec
@@ -49,6 +52,8 @@ func initialize_nodes():
 	right_controller = get_node("RightController")
 	camera = get_node("XRCamera3D")
 	player_body = get_node("PlayerBody")
+	slow_label = get_node("XRCamera3D/Slowed_Label")
+	pause_label = get_node("XRCamera3D/Paused_Label")
 
 
 # ------ locomotion methods -------
@@ -125,8 +130,12 @@ func handle_time_toggle() -> void:
 			time_paused = !time_paused  # Toggle pause state
 			emit_signal("time_toggled_signal", time_paused)
 			time_toggle_flag = true
+			
+			
 	else:
 		time_toggle_flag = false
+	
+	pause_label.visible = time_paused
 
 
 
@@ -150,7 +159,10 @@ func toggle_slow_time():
 		Engine.time_scale = slow_time_scale
 		move_speed = DEFAULT_MOVE_SPEED / slow_time_scale
 		turn_speed = DEFAULT_TURN_SPEED / slow_time_scale
+		slow_label.visible = true
+		
 	else:
 		Engine.time_scale = 1
 		move_speed = DEFAULT_MOVE_SPEED
 		turn_speed = DEFAULT_TURN_SPEED
+		slow_label.visible = false

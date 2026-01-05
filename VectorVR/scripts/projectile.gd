@@ -20,33 +20,12 @@ var frozen_velocity: Vector3 = Vector3.ZERO
 func _ready() -> void:
 	initialize_nodes()
 	set_velocity_colours()
-	create_pause_hud()
-	
-
-
-func create_pause_hud() -> void:
-	pause_label = Label3D.new()
-	pause_label.text = "[TIME PAUSED]"
-	pause_label.font_size = 48
-	pause_label.outline_size = 8
-	pause_label.modulate = Color(1, 0, 0, 1)
-	pause_label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	pause_label.visible = false
-	pause_label.position = Vector3(0, 0.3, -1.5)
-	
-	var camera = get_node("/root/Main/user/XROrigin3D/XRCamera3D")
-	if camera:
-		camera.add_child(pause_label)
-	else:
-		add_child(pause_label)
 
 func _process(delta: float) -> void:
 	if not is_paused:
 		process_vectors(delta)
-		pause_label.visible = false
 	else:
 		display_frozen_vectors()
-		pause_label.visible = true
 
 func display_frozen_vectors() -> void:
 	velocity_vectors.visible = true
