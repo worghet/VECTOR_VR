@@ -1,26 +1,31 @@
-extends Node3D
+extends Node3D 
 
+# MAIN.GD =========================
+
+# Standard vr interface stuff.
 var m_interfaceVr : XRInterface
 var m_transformVr : Transform3D
 
-# References to scene nodes
+# Reference nodes
 var user_node : Node3D
 var projectile_node : Node3D
 var ball : RigidBody3D
 
+# Time-stop variables
 var stored_linear_velocity: Vector3 = Vector3.ZERO
 var stored_angular_velocity: Vector3 = Vector3.ZERO
 var stored_gravity_scale: float = 1.0
 var stored_position: Vector3 = Vector3.ZERO
 var is_time_paused: bool = false
-
-# Prevent rapid toggle issues
 var is_transitioning: bool = false
+
 
 func _ready():
 	initializeInterfaces()
 	initialize_references()
 	
+	
+# Default init function, dunno what it does.
 func initializeInterfaces():
 	m_interfaceVr = XRServer.find_interface("OpenXR")
 	if m_interfaceVr and m_interfaceVr.is_initialized():
@@ -32,15 +37,16 @@ func initializeInterfaces():
 func processOpenXrPoseRecentered():
 	XRServer.center_on_hmd(XRServer.RESET_BUT_KEEP_TILT, true)
 
+# Initializes the references to used nodes.
 func initialize_references():
 	user_node = get_node("user")
 	projectile_node = get_node("projectile")
 	ball = projectile_node.get_node("Ball")
-	
-	var xr_origin = user_node.get_node("XROrigin3D")
+
+		
+	var xr_origin = user_node.get_node("Controller")
 	xr_origin.connect("time_toggled_signal", Callable(self, "_on_time_control_pressed"))
 	xr_origin.connect("reset_ball", Callable(self, "on_reset_called"))
-	# self.connect("time_toggled_signal", Callable(self, "on_reset_called"))
 
 func on_reset_called(right_hand_pos : Vector3):
 	var new_ball_pos = right_hand_pos

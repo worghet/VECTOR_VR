@@ -9,37 +9,37 @@
 
 [node name="user" type="Node3D"]
 
-[node name="XROrigin3D" type="XROrigin3D" parent="."]
+[node name="Controller" type="XROrigin3D" parent="."]
 script = ExtResource("1_e81rn")
 
-[node name="XRCamera3D" type="XRCamera3D" parent="XROrigin3D"]
+[node name="Camera" type="XRCamera3D" parent="Controller"]
 
-[node name="Slowed_Label" type="Label3D" parent="XROrigin3D/XRCamera3D"]
+[node name="Slowed_Label" type="Label3D" parent="Controller/Camera"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35476854, -0.65, -1.3440793)
 visible = false
 modulate = Color(1, 1, 1, 0.45882353)
 text = "<SLOWED>"
 font = ExtResource("2_dekx4")
 
-[node name="Paused_Label" type="Label3D" parent="XROrigin3D/XRCamera3D"]
+[node name="Paused_Label" type="Label3D" parent="Controller/Camera"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.44470578, -0.65, -1.3440793)
 visible = false
 modulate = Color(1, 1, 1, 0.9647059)
 text = "<PAUSED>"
 font = ExtResource("2_dekx4")
 
-[node name="LeftController" type="XRController3D" parent="XROrigin3D"]
+[node name="LeftController" type="XRController3D" parent="Controller"]
 tracker = &"left_hand"
 
-[node name="LeftHand" parent="XROrigin3D/LeftController" instance=ExtResource("2_s8n3g")]
+[node name="LeftHand" parent="Controller/LeftController" instance=ExtResource("2_s8n3g")]
 
-[node name="PickupFunction" parent="XROrigin3D/LeftController/LeftHand" instance=ExtResource("2_e81rn")]
+[node name="PickupFunction" parent="Controller/LeftController/LeftHand" instance=ExtResource("2_e81rn")]
 
-[node name="RightController" type="XRController3D" parent="XROrigin3D"]
+[node name="RightController" type="XRController3D" parent="Controller"]
 tracker = &"right_hand"
 
-[node name="RightHand" parent="XROrigin3D/RightController" instance=ExtResource("4_dekx4")]
+[node name="RightHand" parent="Controller/RightController" instance=ExtResource("4_dekx4")]
 
-[node name="PickupFunction" parent="XROrigin3D/RightController/RightHand" instance=ExtResource("2_e81rn")]
+[node name="PickupFunction" parent="Controller/RightController/RightHand" instance=ExtResource("2_e81rn")]
 
-[node name="PlayerBody" parent="XROrigin3D" instance=ExtResource("7_205wt")]
+[node name="PlayerBody" parent="Controller" instance=ExtResource("7_205wt")]

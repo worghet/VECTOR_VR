@@ -50,10 +50,10 @@ func _process(delta: float) -> void:
 func initialize_nodes():
 	left_controller = get_node("LeftController")
 	right_controller = get_node("RightController")
-	camera = get_node("XRCamera3D")
+	camera = get_node("Camera")
 	player_body = get_node("PlayerBody")
-	slow_label = get_node("XRCamera3D/Slowed_Label")
-	pause_label = get_node("XRCamera3D/Paused_Label")
+	slow_label = get_node("Camera/Slowed_Label")
+	pause_label = get_node("Camera/Paused_Label")
 
 
 # ------ locomotion methods -------
